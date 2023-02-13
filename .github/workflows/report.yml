@@ -1,0 +1,41 @@
+name: REPORT
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: '0 14 * * 2' # At 14:00 UTC+0 on Tuesday
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: fregante/setup-git-user@v1 # https://github.com/marketplace/actions/setup-git-user
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          # https://dev.to/mattpocockuk/how-to-cache-nodemodules-in-github-actions-with-yarn-24eh
+
+      - name: Install packages
+        run: yarn install
+
+      - name: Generate Daily Report
+        run: |
+          time=$(date '+%Y%m%d')
+          yesterday=$(date --date="yesterday" '+%Y%m%d')
+
+          filename="${time}_report.json"
+          yesterdayfile="${yesterday}_report.json"
+
+          node main.js ${{ secrets.REBASEBEARERTOKEN }} ${{ secrets.GEARTWITTERID }} $filename
+          node diff.js $yesterday $filename $yesterdayfile
+
+          git add report/
+          git commit -m "$time report"
+          git push

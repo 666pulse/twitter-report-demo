@@ -1,0 +1,12 @@
+{
+  "name": "twitter-report",
+  "version": "0.0.1",
+  "main": "main.js",
+  "repository": "https://github.com/GearFans/twitter-report",
+  "author": "Gearfans Team",
+  "license": "BSD 3-Clause",
+  "dependencies": {
+    "twitter-api-sdk": "^1.2.1",
+    "yargs": "^17.6.2"
+  }
+}
